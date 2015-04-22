@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('username')->unique(); // used for slug.
             $table->string('email')->unique();
             $table->string('password', 60);
+            $table->string('phone', 60);
             $table->string('confirmation_code');
             $table->boolean('confirmed')->default(false);
             $table->boolean('admin')->default(false);
@@ -35,7 +36,7 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::drop('users');
+        Schema::dropIfExists('users');
     }
 
 }
