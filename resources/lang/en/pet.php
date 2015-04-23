@@ -10,4 +10,5 @@ return [
 	"born" 		=> "Born",
 	"tall" 		=> "Tall",
 	"weight" 	=> "Weight",
+	"pet_users" 	=> "Pet Users",
 ];

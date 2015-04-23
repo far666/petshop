@@ -55,6 +55,49 @@ class PetController extends Controller {
 		return redirect($this->redirectPath());
 	}
 
+	public function getShow($id)
+	{
+		$pet = Pet::find($id);
+		return view('pet.show',compact('pet'));
+	}
+
+	public function getEdituser($id)
+	{
+		$pet = Pet::find($id);
+		$users = User::all();
+
+		$selected = array();
+		foreach ($pet->users as $user) {
+			$selected[] = $user->id;
+		}
+		var_dump($selected);
+		return view('pet.edituser',compact('pet','users','selected'));
+	}
+
+
+	public function postEdituser(Request $request,$id)
+	{
+		$this->pet = Pet::find($id);
+		$selected = $request->input('user_id');
+		$this->pet->users()->detach();
+		$this->pet->users()->attach($selected);
+		return redirect($this->redirectPath());
+	}
+
+
+	public function getEdit()
+	{
+		// $users = User::all();
+		// return view('pet.edituser',compact('users'));
+	}
+
+
+	public function postEdit()
+	{
+		// $this->pet->users()->attach($this->auth->user()->id);
+		// return redirect($this->redirectPath());
+	}
+
 	/**
 	 * Get the post register / login redirect path.
 	 *
