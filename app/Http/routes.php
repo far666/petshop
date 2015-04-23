@@ -60,6 +60,8 @@ Route::controllers([
     'password' => 'Auth\PasswordController',
 ]);
 
+Route::controllers(['pet' => 'PetController']);
+
 if (Request::is('admin/*'))
 {
     require __DIR__.'/admin_routes.php';

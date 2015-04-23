@@ -19,9 +19,10 @@ class CreatePetsTable extends Migration {
 			$table->integer('kind_id');		//1=dog,2=cat
 			$table->integer('type_id');		//1=mixd,2=maltese..others
 			$table->string('sex');		
-			$table->integer('age');
+			$table->date('born');
 			$table->integer('tall');
 			$table->integer('weight');
+			$table->boolean('status')->default(1);
 			$table->timestamps();
 		});
 
