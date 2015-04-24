@@ -55,10 +55,12 @@ class PetController extends Controller {
 		return redirect($this->redirectPath());
 	}
 
-	public function getShow($id)
+	public function getShow($id,Guard $auth)
 	{
 		$pet = Pet::find($id);
-		return view('pet.show',compact('pet'));
+		$admin = $pet->admin($auth->user()->id);
+
+		return view('pet.show',compact('pet','admin'));
 	}
 
 	public function getAdduser($id,Guard $auth)
