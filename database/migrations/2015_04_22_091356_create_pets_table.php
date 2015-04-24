@@ -31,6 +31,7 @@ class CreatePetsTable extends Migration {
 		{
 			$table->integer('user_id');
 			$table->integer('pet_id');
+			$table->boolean('admin');
 		});
 	}
 

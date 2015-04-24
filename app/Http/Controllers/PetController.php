@@ -51,7 +51,7 @@ class PetController extends Controller {
 		$this->pet->save();
 
 		$this->auth = $auth;
-		$this->pet->users()->attach($this->auth->user()->id);
+		$this->pet->users()->attach($this->auth->user()->id,['admin' => 1]);
 		return redirect($this->redirectPath());
 	}
 
@@ -61,26 +61,57 @@ class PetController extends Controller {
 		return view('pet.show',compact('pet'));
 	}
 
-	public function getEdituser($id)
+	public function getAdduser($id,Guard $auth)
 	{
 		$pet = Pet::find($id);
-		$users = User::all();
-
-		$selected = array();
-		foreach ($pet->users as $user) {
-			$selected[] = $user->id;
+		
+		$admin = $pet->admin($auth->user()->id);
+		if($admin){
+			$users = User::all();
+			foreach ($users as $index => $user) {
+				foreach ($pet->users as $selected_user) {
+					if($user->id == $selected_user->id){
+						unset($users[$index]);
+						break;
+					}
+				}
+			}
+		}else {
+			$user = array();
 		}
-		var_dump($selected);
-		return view('pet.edituser',compact('pet','users','selected'));
+
+		return view('pet.adduser',compact('pet','users','admin'));
 	}
 
 
-	public function postEdituser(Request $request,$id)
+	public function postAdduser(Request $request,$id)
 	{
 		$this->pet = Pet::find($id);
-		$selected = $request->input('user_id');
-		$this->pet->users()->detach();
-		$this->pet->users()->attach($selected);
+		$this->pet->users()->attach($request->input('user_id'));
+		return redirect($this->redirectPath());
+	}
+
+	public function getDeluser($id,Guard $auth)
+	{
+		$pet = Pet::find($id);
+		
+		$admin = $pet->admin($auth->user()->id);
+		
+		$users = array();
+		foreach ($pet->users as $user) {
+			if($user->id != $auth->user()->id) {
+				$users[]  = $user;
+			}
+		}
+		
+		return view('pet.deluser',compact('pet','users','admin'));
+	}
+
+
+	public function postDeluser(Request $request,$id)
+	{
+		$this->pet = Pet::find($id);
+		$this->pet->users()->detach($request->input('user_id'));
 		return redirect($this->redirectPath());
 	}
 

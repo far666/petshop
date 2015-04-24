@@ -19,7 +19,7 @@
 					<div class="row">
 						<div class="col-md-8">
 							<h4>
-								<strong><a href="{{URL::to('pet/'.$pet->id.'')}}">{!! $pet->name !!}</a></strong>
+								<strong><a href="{{URL::to('pet/show/'.$pet->id.'')}}">{!! $pet->name !!}</a></strong>
 							</h4>
 						</div>
 					</div>

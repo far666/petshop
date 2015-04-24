@@ -13,7 +13,12 @@
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<a href="{{URL::to('pet/edituser/'.$pet->id)}}">Edit user</a>
+			<a href="{{URL::to('pet/adduser/'.$pet->id)}}">Add user</a>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<a href="{{URL::to('pet/deluser/'.$pet->id)}}">Del user</a>
 		</div>
 	</div>
 	<div class="row">

@@ -31,6 +31,6 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 	}
 
 	public function pets() {
-		return $this->belongsToMany('App\Pet');
+		return $this->belongsToMany('App\Pet')->withPivot('admin');
 	}
 }
