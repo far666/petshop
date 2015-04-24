@@ -62,6 +62,8 @@ Route::controllers([
 
 Route::controllers(['pet' => 'PetController']);
 
+Route::controllers(['recode' => 'RecodeController']);
+
 if (Request::is('admin/*'))
 {
     require __DIR__.'/admin_routes.php';

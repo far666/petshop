@@ -15,11 +15,13 @@ class CreateRecodesTable extends Migration {
 		Schema::create('recodes', function(Blueprint $table)
 		{
 			$table->increments('id');
+			$table->integer('user_id');	//foreign key from user
 			$table->integer('pet_id');	//foreign key from pet
 			$table->integer('status');
-			$table->string('service',60);	//wash, cut ..etc
+			$table->integer('service');
 			$table->integer('price');
 			$table->integer('payment');	//how to pay ,now should be only cash
+			$table->date('service_date');	//how to pay ,now should be only cash
 			$table->timestamps();
 		});
 	}
