@@ -5,10 +5,12 @@ use App\Http\Controllers\Controller;
 
 use App\Pet;
 use App\User;
+use App\Recode;
 
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 
+use Illuminate\Support\Facades\Session;
 class RecodeController extends Controller {
 
 	protected $pet;
@@ -29,14 +31,16 @@ class RecodeController extends Controller {
 
 	protected $payment_method = [
 				0=>'cash',
+				1=>'cash 23',
 			];
 
 	public function getIndex(Guard $auth)
 	{
 		$user = $auth->user();
-		$recodes = $user->recodes;
 		$status = $this->status;
-		return view('recode.index',compact('recodes','status'));
+		$services = $this->services;
+		$payment_method = $this->payment_method;
+		return view('recode.index',compact('user','status','services','payment_method'));
 	}
 
 	public function getCreate(Guard $auth)
@@ -50,25 +54,50 @@ class RecodeController extends Controller {
 	public function postCreate(Request $request,Guard $auth)
 	{
 		/**
-		 *	1.add pet 	
-		 *	2.add the relationship user_pet	
+		 *	add recode
 		 */
-		
-		$this->pet = new Pet;
-		$this->pet->name 	= $request->input('petname');
-		$this->pet->kind_id 	= $request->input('kind_id');
-		$this->pet->type_id 	= $request->input('type_id');
-		$this->pet->sex 	= $request->input('sex');
-		$this->pet->born 	= date("Y-m-d",strtotime($request->input('born')));
-		$this->pet->tall 	= $request->input('tall');
-		$this->pet->weight 	= $request->input('weight');
-		$this->pet->save();
 
-		$this->auth = $auth;
-		$this->pet->users()->attach($this->auth->user()->id,['admin' => 1]);
+		$recode = new Recode;
+		$recode->user_id	= $auth->user()->id;
+		$recode->pet_id 	= $request->input('pet_id');
+		$recode->service 	= $request->input('service');
+		$recode->payment 	= $request->input('payment');	
+		$recode->service_date 	= date("Y-m-d",strtotime($request->input('service_date')));
+		$recode->status 	= array_search('預約中',$this->status);
+		
+		/**
+		*	check the selected pet dont have other alive reserve today
+		*/
+		$pet = Pet::find($recode->pet_id);	
+		if($pet->reserved($recode->service_date))
+			return redirect($this->redirectPath())->with("error","$pet->name already has a reservetion on $recode->service_date. ");
+
+		$recode->save();	
 		return redirect($this->redirectPath());
 	}
 
+	
+	/*
+	*  use to cancel a recode
+	*/
+	public function anyCancel($recode_id,Guard $auth)
+	{
+		$recode  = Recode::find($recode_id);
+		if($recode->user_id != $auth->user()->id || !in_array($recode->status, array(array_search('預約中',$this->status), array_search('預約成功',$this->status)))) 
+			return redirect('recode')->with('error', 'You can not cancel this ! ');
+		
+		/*
+			change status to cancel
+		*/
+		$recode->status = array_search("取消", $this->status);
+		$recode->save();
+
+		return redirect('recode')->with('success', 'Your Reserve is Canceled! ');
+	}
+
+	/*
+	* won't use this
+	*/
 	public function getShow($id,Guard $auth)
 	{
 		$pet = Pet::find($id);
@@ -77,72 +106,32 @@ class RecodeController extends Controller {
 		return view('pet.show',compact('pet','admin'));
 	}
 
-	public function getAdduser($id,Guard $auth)
+	public function getEdit($recode_id,Guard $auth)
 	{
-		$pet = Pet::find($id);
-		
-		$admin = $pet->admin($auth->user()->id);
-		if($admin){
-			$users = User::all();
-			foreach ($users as $index => $user) {
-				foreach ($pet->users as $selected_user) {
-					if($user->id == $selected_user->id){
-						unset($users[$index]);
-						break;
-					}
-				}
-			}
-		}else {
-			$user = array();
-		}
+		$recode = Recode::find($recode_id);
+		if(empty($recode))
+			return redirect('recode')->with('error', 'No Such Recode !');
 
-		return view('pet.adduser',compact('pet','users','admin'));
+		if($recode->user_id != $auth->user()->id || !in_array($recode->status,array(array_search('預約中',$this->status),array_search('預約成功',$this->status))))
+			return redirect('recode')->with('error', 'You can not edit this recode! ');
+
+		$services = $this->services;
+		$payment_method = $this->payment_method;
+		return view('recode.edit',compact('recode','services','payment_method'));
 	}
 
 
-	public function postAdduser(Request $request,$id)
+	public function postEdit($recode_id,Request $request,Guard $auth)
 	{
-		$this->pet = Pet::find($id);
-		$this->pet->users()->attach($request->input('user_id'));
+		if($recode->user_id != $auth->user()->id) 
+			return redirect('recode')->with('error', 'You can not edit this recode! ');
+		
+		$recode = Recode::find($recode_id);
+		$recode->service 	= $request->input('service');
+		$recode->payment 	= $request->input('payment');	
+		$recode->service_date 	= date("Y-m-d",strtotime($request->input('service_date')));
+
 		return redirect($this->redirectPath());
-	}
-
-	public function getDeluser($id,Guard $auth)
-	{
-		$pet = Pet::find($id);
-		
-		$admin = $pet->admin($auth->user()->id);
-		
-		$users = array();
-		foreach ($pet->users as $user) {
-			if($user->id != $auth->user()->id) {
-				$users[]  = $user;
-			}
-		}
-		
-		return view('pet.deluser',compact('pet','users','admin'));
-	}
-
-
-	public function postDeluser(Request $request,$id)
-	{
-		$this->pet = Pet::find($id);
-		$this->pet->users()->detach($request->input('user_id'));
-		return redirect($this->redirectPath());
-	}
-
-
-	public function getEdit()
-	{
-		// $users = User::all();
-		// return view('pet.edituser',compact('users'));
-	}
-
-
-	public function postEdit()
-	{
-		// $this->pet->users()->attach($this->auth->user()->id);
-		// return redirect($this->redirectPath());
 	}
 
 	/**

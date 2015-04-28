@@ -45,6 +45,9 @@
 								<li>
 									<a href="{!! URL::to('pet') !!}"><i class="fa fa-tachometer"></i> Pet</a>
 								</li>
+								<li>
+									<a href="{!! URL::to('recode') !!}"><i class="fa fa-tachometer"></i> Recode</a>
+								</li>
 								<li role="presentation" class="divider"></li>
 							@endif
 							<li>

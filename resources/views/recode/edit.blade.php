@@ -12,7 +12,7 @@
 @section('content')
 	<div class="row">
 		<div class="page-header">
-			<h2>{{{ trans('recode.create') }}}</h2>
+			<h2>{{{ trans('recode.edit_title') }}}</h2>
 		</div>
 	</div>
 
@@ -20,28 +20,23 @@
 		<div class="row">
 			@include('errors.list')
 
-			<form class="form-horizontal" role="form" method="POST" action="{!! URL::to('/recode/create') !!}">
+			<form class="form-horizontal" role="form" method="POST" action="{!! URL::to('/recode/edit') !!}">
 				<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
+				<div class="form-group">
+					<label class="col-md-4 control-label">{{{ trans('recode.pet') }}}</label>
+
+					<div class="col-md-6">
+						{{$recode->pet->name}}
+					</div>
+				</div>
 				<div class="form-group">
 					<label class="col-md-4 control-label">{{{ trans('recode.service') }}}</label>
 
 					<div class="col-md-6">
 						<select name="service" class="form-control input-sm">
 							@foreach ($services as $key =>$service)
-								<option value="{{{$key}}}">{{{$service}}}</option>
-							@endforeach
-						</select>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-md-4 control-label">{{{ trans('recode.pet') }}}</label>
-
-					<div class="col-md-6">
-						<select name="pet_id" class="form-control input-sm">
-							@foreach ($pets as $pet)
-								<option value="{{{$pet->id}}}">{{{$pet->name}}}</option>
+								<option value="{{{$key}}}" @if($key == $recode->service) selected @endif>{{{$service}}}</option>
 							@endforeach
 						</select>
 					</div>
@@ -51,7 +46,7 @@
 					<label class="col-md-4 control-label">{{{ trans('pet.service_date') }}}</label>
 
 					<div class="col-md-6">
-						<input type="text" class="form-control datepicker" name="service_date" value="{{ old('service_date') }}">
+						<input type="text" class="form-control datepicker" name="service_date" value="{{{date("m/d/Y",strtotime($recode->service_date))}}}">
 					</div>
 				</div>
 
@@ -61,7 +56,7 @@
 					<div class="col-md-6">
 						<select name="payment" class="form-control input-sm">
 							@foreach ($payment_method as $key=>$method)
-								<option value="{{{$key}}}">{{{$method}}}</option>
+								<option value="{{{$key}}}" @if($key == $recode->payment) selected @endif>{{{$method}}}</option>
 							@endforeach
 						</select>
 					</div>
@@ -70,7 +65,10 @@
 				<div class="form-group">
 					<div class="col-md-6 col-md-offset-4">
 						<button type="submit" class="btn btn-primary">
-							{{{ trans('recode.reserve') }}}
+							{{{ trans('recode.edit') }}}
+						</button>
+						<button type="button" class="btn btn-danger" onclick="cancel()">
+							{{{ trans('recode.cancel') }}}
 						</button>
 					</div>
 				</div>
@@ -88,5 +86,11 @@
 		$(function(){
 			$('.datepicker').datepicker();
 		});
+		function cancel(){
+			var check = confirm("Are You Sure To Cancel ?");
+			if(check){
+				window.location= "{!! URL::to('/recode/cancel/'.$recode->id) !!}";
+			}
+		}
 	</script>
 @stop

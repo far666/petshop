@@ -1,6 +1,20 @@
 @extends('app')
 @section('title') Home :: @parent @stop
 @section('content')
+	@if ($error = Session::get('error'))
+		<div class="alert alert-danger alert-block">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<h4>Fail</h4>
+			{{ $error }}
+		</div>
+	@endif
+	@if ($success = Session::get('success'))
+		<div class="alert alert-success alert-block">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<h4>Success</h4>
+			{{ $success }}
+		</div>
+	@endif
 	<div class="row">
 		<div class="page-header">
 			<h2>Recode</h2>
@@ -11,16 +25,15 @@
 			<a href="{{URL::to('recode/create')}}">reserve</a>
 		</div>
 	</div>
-	@if(count($recodes)>0)
-		<div class="row">
-			<h2>My Recodes</h2>
-
-
+	
+	<div class="row">
+		<h2>My Recodes</h2>
+		@foreach ($user->pets as $pet)
+			<h3>{!!$pet->name!!}</h3>
 			<table class="table">
 				<thead>
 					<tr>
-						<!-- <th>recode id</th> -->
-						<th>pet name</th>
+						<th>user name</th>
 						<th>service</th>
 						<th>price</th>
 						<th>payment method</th>
@@ -32,24 +45,31 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach ($recodes as $recode)
+					@foreach ($pet->recodes as $recode)
 						<tr>
-							<!-- <td>{!!$recode->id!!}</td> -->
-							<td>{!!$recode->pet->name!!}</td>
-							<td>{!!$recode->service!!}</td>
+							<td>{!!$recode->user->name!!}</td>
+							<td>{{$services[$recode->service]}}</td>
 							<td>{!!$recode->price!!}</td>
-							<td>{!!$recode->payment!!}</td>
+							<td>{{$payment_method[$recode->payment]}}</td>
 							<td>{!!$recode->service_date!!}</td>
 							<td>{!!$recode->created_at!!}</td>
 							<td>{!!$recode->updated_at!!}</td>
 							<td>{!!$status[$recode->status]!!}</td>
-							<td></td>
-						</tr>	
+							<td>
+								@if($recode->status == array_search('預約中',$status) || $recode->status == array_search('預約成功',$status))
+									@if($recode->user_id == $user->id)
+										<a class="text-info" href="{{URL::to('recode/edit/'.$recode->id)}}">Edit</a>
+										<a class="text-warning" href="{{URL::to('recode/cancel/'.$recode->id)}}">Cancel</a>
+									@endif
+								@endif
+							</td>
+						</tr>
 					@endforeach
 				</tbody>
 			</table>
-		</div>
-	@endif	
+		@endforeach	
+	</div>
+	
 @endsection
 
 @section('scripts')
@@ -58,6 +78,7 @@
 		$('#myCarousel').carousel({
 			interval: 4000
 		});
+
 	</script>
 @endsection
 @stop
