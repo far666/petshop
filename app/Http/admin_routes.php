@@ -98,5 +98,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function() {
     Route::post('users/{id}/delete', 'Admin\UserController@postDelete');
     Route::get('users/data', 'Admin\UserController@data');
 
-
+    #Recode
+    Route::get('recodes/', 'RecodeController@getAdmin');    
+    Route::get('recodes/edit/{id}', 'RecodeController@getAdminedit');    
 });
