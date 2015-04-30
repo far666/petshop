@@ -34,7 +34,7 @@ class Recode extends Model {
 	}
 
 	/**
-	*	update recode status
+	*	update recode status, (not necessary
 	*
 	*@return boolean
 	*/

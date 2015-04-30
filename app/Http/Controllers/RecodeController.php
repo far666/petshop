@@ -102,12 +102,15 @@ class RecodeController extends Controller {
 	}
 
 
-	public function postEdit($recode_id,Request $request,Guard $auth)
+	public function postEdit(Request $request,Guard $auth,$recode_id)
 	{
 		if($recode->user_id != $auth->user()->id) 
 			return redirect('recode')->with('error', 'You can not edit this recode! ');
 		
 		$recode = Recode::find($recode_id);
+		if(empty($recode))
+			return redirect('/admin/recodes/'.date('Y-m-d'))->with('error','No Such Recode');	
+
 		$recode->service 	= $request->input('service');
 		$recode->payment 	= $request->input('payment');	
 		$recode->service_date 	= date("Y-m-d",strtotime($request->input('service_date')));
@@ -115,25 +118,109 @@ class RecodeController extends Controller {
 		return redirect($this->redirectPath());
 	}
 
-	public function getAdmin(Guard $auth)
+	public function getAdmin(Guard $auth,$date='')
 	{
-		
-		if($auth->user()->admin != 1)
+		if($auth->user()->admin != 1 )
 			return redirect($this->redirectPath());	
-		$date = "2015-04-28";
-
-		$recodes = Recode::where("service_date","=",$date)->take(1);
-
-		foreach ($recodes as $recode) {
-			echo $recode->id."<br>";
-		}
-
-		$status = Recode::$status;
+		if(!preg_match("/[0-9]{4}-[0-9]{2}-[0-9]{2}/",$date)) 
+			return redirect("/admin/recodes/".date('Y-m-d'));	
+		
+		$recodes = Recode::where("service_date","=",$date)->get();
+		$status 	= Recode::$status;
 		$services = Recode::$services;
 		$payment_method = Recode::$payment_method;
 		
+		return view('recode.admin',compact('recodes','status','services','payment_method','date'));
+	}
 
-		return view('recode.admin',compact('recodes','status','services','payment_method'));
+	public function getAdminedit(Guard $auth,$recode_id)
+	{
+		if($auth->user()->admin != 1)
+			return redirect($this->redirectPath());	
+
+		$recode = Recode::find($recode_id);
+		if(empty($recode))
+			return redirect('/admin/recodes/'.date('Y-m-d'))->with('error','No Such Recode');	
+		
+		$services = Recode::$services;
+		$payment_method = Recode::$payment_method;
+		$status = Recode::$status;
+		return view('recode.adminedit',compact('recode','services','payment_method','status'));
+	}
+
+	public function postAdminedit(Request $request,Guard $auth,$recode_id)
+	{
+		if($auth->user()->admin != 1)
+			return redirect($this->redirectPath());	
+
+		$recode = Recode::find($recode_id);
+		if(empty($recode))
+			return redirect('/admin/recodes/'.date('Y-m-d'))->with('error','No Such Recode');	
+		
+		$recode->service 	= $request->input('service');
+		$recode->payment 	= $request->input('payment');	
+		$recode->service_date 	= date("Y-m-d",strtotime($request->input('service_date')));
+
+		/*admin only*/
+		$recode->status 	= $request->input('status');
+		$recode->price 	 	= $request->input('price');
+		$recode->paied 	= $request->input('paied');
+
+		if($recode->save())
+			return  redirect('/admin/recodes/'.$recode->service_date)->with('success','Edit Success');
+		else
+			return  redirect('/admin/recodes/'.$recode->service_date)->with('error','Something wrong  when you edit recode');
+	}
+
+	public function getAdmincreate(Guard $auth)
+	{
+		if($auth->user()->admin != 1)
+			return redirect($this->redirectPath());	
+		
+		$services = Recode::$services;
+		$payment_method = Recode::$payment_method;
+		$status = Recode::$status;
+		return view('recode.admincreate',compact('services','payment_method','status'));
+	}
+
+	public function postAdmincreate(Request $request,Guard $auth)
+	{
+		if($auth->user()->admin != 1)
+			return redirect($this->redirectPath());	
+		
+		$recode = new Recode;		
+		$recode->user_id 	= $auth->user()->id;
+		$recode->pet_id 	= $request->input('pet_id');
+		$recode->service 	= $request->input('service');
+		$recode->payment 	= $request->input('payment');	
+		$recode->service_date 	= date("Y-m-d");
+
+		/*admin only*/
+		$recode->status 	= $request->input('status');
+		$recode->paied 	= ($request->input('paied')) ?1:0;
+
+		if($recode->save())
+			return  redirect('/admin/recodes/'.$recode->service_date)->with('success','Create Success');
+		else
+			return  redirect('/admin/recodes/'.$recode->service_date)->with('error','Something wrong  when you create recode');
+	}
+
+	public function postFinduser(Request $request,Guard $auth)
+	{
+		if($auth->user()->admin != 1)
+			return redirect($this->redirectPath());	
+		
+		$phone = $request->input('phone');
+		$user = User::where("phone","=",$phone)->first();
+		
+		if(empty($user))
+			return json_encode(array('msg'=>'no user'));
+		
+		$data = array();
+		$data['user'] = $user;
+		$data['pets'] = $user->pets;
+
+		return json_encode($data);
 	}
 
 	/**

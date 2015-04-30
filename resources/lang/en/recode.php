@@ -10,4 +10,9 @@ return [
 	"edit" 		=> "Edit ",
 	"status" 	=> "Status ",
 	"cancel" 	=> "Cancel ",
+	"date" 		=> "Date ",
+	"paied" 	=> "Paied ",
+	"price" 		=> "Price ",
+	"user" 		=> "User ",
+	"search_user_by_phone" 	=> "Search User By Phone ",
 ];

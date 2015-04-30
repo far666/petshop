@@ -99,6 +99,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function() {
     Route::get('users/data', 'Admin\UserController@data');
 
     #Recode
+    Route::get('recodes/create', 'RecodeController@getAdmincreate');   
+    Route::post('recodes/create', 'RecodeController@postAdmincreate');    
     Route::get('recodes/', 'RecodeController@getAdmin');    
+    Route::get('recodes/{date}', 'RecodeController@getAdmin');    
     Route::get('recodes/edit/{id}', 'RecodeController@getAdminedit');    
+    Route::post('recodes/edit/{id}', 'RecodeController@postAdminedit');   
+   
+    Route::post('recodes/finduser', 'RecodeController@postFinduser');
 });

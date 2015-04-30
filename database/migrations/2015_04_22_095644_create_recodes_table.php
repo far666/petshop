@@ -21,6 +21,7 @@ class CreateRecodesTable extends Migration {
 			$table->integer('service');
 			$table->integer('price');
 			$table->integer('payment');	//how to pay ,now should be only cash
+			$table->boolean('paied');
 			$table->date('service_date');	//how to pay ,now should be only cash
 			$table->timestamps();
 		});
