@@ -17,7 +17,7 @@ class Pet extends Model {
 	}
 
 	public function recodes() {
-		return $this->hasMany('App\Recode');
+		return $this->hasMany('App\Recode')->orderBy('created_at','desc');
 	}
 
 	public function admin($user_id) {

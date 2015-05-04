@@ -7,6 +7,7 @@ use App\Pet;
 use App\User;
 use App\Kind;
 use App\Type;
+use App\Recode;
 
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
@@ -55,12 +56,15 @@ class PetController extends Controller {
 		return redirect($this->redirectPath());
 	}
 
-	public function getShow($id,Guard $auth)
+	public function getShow(Guard $auth,$id)
 	{
 		$pet = Pet::find($id);
 		$admin = $pet->admin($auth->user()->id);
 
-		return view('pet.show',compact('pet','admin'));
+		$status = Recode::$status;
+		$services = Recode::$services;
+		$payment_method = Recode::$payment_method;
+		return view('pet.show',compact('pet','admin','status','services','payment_method'));
 	}
 
 	public function getAdduser($id,Guard $auth)
@@ -116,7 +120,6 @@ class PetController extends Controller {
 		$this->pet->users()->detach($request->input('user_id'));
 		return redirect($this->redirectPath());
 	}
-
 
 	public function getEdit()
 	{

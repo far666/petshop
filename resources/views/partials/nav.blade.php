@@ -41,6 +41,9 @@
 									<li>
 										<a href="{!! URL::to('admin/dashboard') !!}"><i class="fa fa-tachometer"></i> Dashboard</a>
 									</li>
+									<li>
+										<a href="{!! URL::to('admin/recodes') !!}"><i class="fa fa-tachometer"></i> Admin Recodes</a>
+									</li>
 								@endif
 								<li>
 									<a href="{!! URL::to('pet') !!}"><i class="fa fa-tachometer"></i> Pet</a>

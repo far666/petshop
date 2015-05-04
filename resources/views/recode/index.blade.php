@@ -29,7 +29,7 @@
 	<div class="row">
 		<h2>My Recodes</h2>
 		@foreach ($user->pets as $pet)
-			<h3>{!!$pet->name!!}</h3>
+			<h3><a href="{{URL::to('pet/show/'.$pet->id.'')}}">{!!$pet->name!!}</a></h3>
 			<table class="table">
 				<thead>
 					<tr>
@@ -45,7 +45,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach ($pet->recodes as $recode)
+					@foreach ($pet->recodes->take(3) as $recode)
 						<tr>
 							<td>{!!$recode->user->name!!}</td>
 							<td>{{$services[$recode->service]}}</td>

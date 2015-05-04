@@ -13,6 +13,7 @@ class Recode extends Model {
 				3 =>'完成',
 				4 =>'已領走',
 				5 =>'取消',
+				6 =>'逾時系統取消',
 			];
 	static public $services =[
 				0=>'cut',

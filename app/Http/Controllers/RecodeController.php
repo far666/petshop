@@ -129,7 +129,7 @@ class RecodeController extends Controller {
 		$status 	= Recode::$status;
 		$services = Recode::$services;
 		$payment_method = Recode::$payment_method;
-		
+
 		return view('recode.admin',compact('recodes','status','services','payment_method','date'));
 	}
 
@@ -141,7 +141,8 @@ class RecodeController extends Controller {
 		$recode = Recode::find($recode_id);
 		if(empty($recode))
 			return redirect('/admin/recodes/'.date('Y-m-d'))->with('error','No Such Recode');	
-		
+		if(in_array($recode->status,array(4,5,6)))
+			return redirect('/admin/recodes/'.date('Y-m-d'))->with('error','You can not edit a finish recode');
 		$services = Recode::$services;
 		$payment_method = Recode::$payment_method;
 		$status = Recode::$status;

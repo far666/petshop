@@ -74,8 +74,10 @@
 							<td>{!!$status[$recode->status]!!}</td>
 							<td>@if($recode->paied==1) settle @else give me money @endif</td>
 							<td>
-								<a class="text-info" href="{{URL::to('admin/recodes/edit/'.$recode->id)}}">Edit</a>
-								<!-- <a class="text-warning" href="{{URL::to('admin/recode/cancel/'.$recode->id)}}">Cancel</a> -->
+								@if (!in_array($recode->status,array(4,5,6)))
+									<a class="text-info" href="{{URL::to('admin/recodes/edit/'.$recode->id)}}">Edit</a>
+									<!-- <a class="text-warning" href="{{URL::to('admin/recode/cancel/'.$recode->id)}}">Cancel</a> -->
+								@endif
 							</td>
 						</tr>
 					@endforeach
