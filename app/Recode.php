@@ -14,6 +14,7 @@ class Recode extends Model {
 				4 =>'已領走',
 				5 =>'取消',
 				6 =>'逾時系統取消',
+				7 =>'預約已滿',
 			];
 	static public $services =[
 				0=>'cut',

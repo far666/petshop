@@ -22,73 +22,6 @@
 
 			<form class="form-horizontal" role="form" method="POST" action="{!! URL::to('/admin/recodes/create') !!}">
 				<input type="hidden" name="_token" value="{{ csrf_token() }}">
-
-				<div class="form-group">
-					<label class="col-md-4 control-label">{{{ trans('recode.search_user_by') }}}</label>
-					<div class="col-md-6">
-						<select class="select input-sm"  id="method" name="method">
-							<option value="phone">{{{ trans('recode.phone') }}}</option>
-							<option value="name">{{{ trans('recode.name') }}}</option>
-						</select>
-					</div>
-				</div>
-				<div class="form-group">
-					<label class="col-md-4 control-label">{{{ trans('recode.search_user_data') }}}</label>
-					<div class="col-md-6">
-						<input  type="text" class="form-control " name="data" id="data">
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-md-4 control-label"></label>
-					<div class="col-md-6">
-						<button type="button" class="btn" onClick="searchUser()">Search</button>
-					</div>
-					
-				</div>
-
-				<div class="form-group">
-					<label class="col-md-4 control-label">{{{ trans('recode.user') }}}</label>
-					<div class="col-md-6">
-						<select name="user_id" class="form-control input-sm" id="user_id" onchange="searchPet()">
-							<option value="0"></option>
-						</select>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-md-4 control-label">{{{ trans('recode.pet') }}}</label>
-					<div class="col-md-6">
-						<select name="pet_id" class="form-control input-sm" id="pets">
-							<option value="0"></option>
-						</select>
-					</div>
-				</div>
-					
-				<div class="form-group">
-					<label class="col-md-4 control-label">{{{ trans('recode.service') }}}</label>
-
-					<div class="col-md-6">
-						<select name="service" class="form-control input-sm">
-							@foreach ($services as $key =>$service)
-								<option value="{{{$key}}}">{{{$service}}}</option>
-							@endforeach
-						</select>
-					</div>
-				</div>
-				
-				<div class="form-group">
-					<label class="col-md-4 control-label">{{{ trans('recode.payment_method') }}}</label>
-
-					<div class="col-md-6">
-						<select name="payment" class="form-control input-sm">
-							@foreach ($payment_method as $key=>$method)
-								<option value="{{{$key}}}">{{{$method}}}</option>
-							@endforeach
-						</select>
-					</div>
-				</div>
-
 				<div class="form-group">
 					<label class="col-md-4 control-label">{{{ trans('recode.status') }}}</label>
 
@@ -109,13 +42,7 @@
 					</div>
 				</div>
 				
-				<div class="form-group">
-					<label class="col-md-4 control-label">{{{ trans('recode.paied') }}}</label>
-
-					<div class="col-md-6">
-						<input  type="checkbox" class="form-inline checkbox " name="paied" value="1" >
-					</div>
-				</div>
+				
 
 				<div class="form-group">
 					<div class="col-md-6 col-md-offset-4">

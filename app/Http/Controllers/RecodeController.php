@@ -180,7 +180,15 @@ class RecodeController extends Controller {
 		
 		$services = Recode::$services;
 		$payment_method = Recode::$payment_method;
-		$status = Recode::$status;
+		
+		//just show the status we need
+		$status = array();
+		$status[1] = Recode::$status[1];
+		$status[2] = Recode::$status[2];
+		$status[3] = Recode::$status[3];
+		$status[4] = Recode::$status[4];
+		$status[5] = Recode::$status[5];
+
 		return view('recode.admincreate',compact('services','payment_method','status'));
 	}
 
@@ -211,17 +219,78 @@ class RecodeController extends Controller {
 		if($auth->user()->admin != 1)
 			return redirect($this->redirectPath());	
 		
-		$phone = $request->input('phone');
-		$user = User::where("phone","=",$phone)->first();
+		$method 	= $request->input('method');
+		$data 		= $request->input('data');
 		
-		if(empty($user))
-			return json_encode(array('msg'=>'no user'));
-		
-		$data = array();
-		$data['user'] = $user;
-		$data['pets'] = $user->pets;
+		if(empty($data))
+			return json_encode(array('msg'=>'no data to search'));
 
-		return json_encode($data);
+
+		$users = User::where($method,"like","%$data%")->get();
+		if(empty($users))
+			return json_encode(array('msg'=>'no such user'));
+	
+		return json_encode($users);
+	}
+
+	public function postFindpet(Request $request,Guard $auth)
+	{
+		if($auth->user()->admin != 1)
+			return redirect($this->redirectPath());	
+		
+		$user_id = $request->input('user_id');
+		$user = User::find($user_id);
+
+		if(empty($user_id))
+			return json_encode(array('msg'=>'no user selected or no such user'));
+
+		$pets = $user->pets;
+
+		if(empty($pets))
+			return json_encode(array('msg'=>'no pet for this user'));
+
+		return json_encode($pets);
+	}
+
+	public function getAdminreceive(Guard $auth)
+	{
+		if($auth->user()->admin != 1)
+			return redirect($this->redirectPath());	
+		
+		$services = Recode::$services;
+		
+		//just show the status we need
+		$status = array();
+		$status[1] = Recode::$status[1];
+		$status[7] = Recode::$status[7];
+
+		//find all receive
+		$date = date("Y-m-d");
+		$receive_recodes = Recode::where("service_date",">",$date)->where("status","in",array(0,1))->get();
+		
+		$recodes = array();
+		foreach ($receive_recodes as $recode) {
+			$recodes[$recode->service_date][] = $recode;
+		}
+
+		return view('recode.adminreceive',compact('recodes','services','status'));
+	}
+
+	public function postAdminreceive(Request $request,Guard $auth)
+	{
+		if($auth->user()->admin != 1)
+			return redirect($this->redirectPath());	
+		
+		$recode = new Recode;			
+
+		/*admin only*/
+		$recode->status 	= $request->input('status');
+		// $recode->paied 	= ($request->input('paied')) ?1:0;
+
+		if($recode->save())
+			return  redirect('/admin/recodes/receive')->with('success','Success');
+		else
+			return  redirect('/admin/recodes/receive')->with('error','Something wrong  when you check receive recode');
 	}
 
 	/**

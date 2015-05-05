@@ -14,5 +14,8 @@ return [
 	"paied" 	=> "Paied ",
 	"price" 		=> "Price ",
 	"user" 		=> "User ",
-	"search_user_by_phone" 	=> "Search User By Phone ",
+	"search_user_data" 	=> "Search Data ",
+	"search_user_by" 	=> "Search User By ",
+	"phone" 	=> "Phone ",
+	"name" 	=> "Name ",
 ];
