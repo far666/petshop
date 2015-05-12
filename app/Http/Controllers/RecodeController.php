@@ -202,7 +202,7 @@ class RecodeController extends Controller {
 		$recode->pet_id 	= $request->input('pet_id');
 		$recode->service 	= $request->input('service');
 		$recode->payment 	= $request->input('payment');	
-		$recode->service_date 	= date("Y-m-d");
+		$recode->service_date 	= date("Y-m-d",strtotime($request->input('service_date')))	;
 
 		/*admin only*/
 		$recode->status 	= $request->input('status');
@@ -272,8 +272,16 @@ class RecodeController extends Controller {
 		foreach ($receive_recodes as $recode) {
 			$recodes[$recode->service_date][] = $recode;
 		}
+		
+		ksort($recodes);
 
-		return view('recode.adminreceive',compact('recodes','services','status'));
+		//count each days receive num
+		$date_count = array();
+		foreach ($recodes as $date =>$daterecodes) {
+			$date_count[$date] = Recode::where("status","=","1")->where("service_date","=",$date)->count();
+		}
+
+		return view('recode.adminreceive',compact('recodes','services','status','date_count'));
 	}
 
 	public function postAdminreceive(Request $request,Guard $auth)
@@ -281,16 +289,61 @@ class RecodeController extends Controller {
 		if($auth->user()->admin != 1)
 			return redirect($this->redirectPath());	
 		
-		$recode = new Recode;			
+		$status 	= $request->input('status');
+		$recode_ids	= $request->input('checked_recode');
 
-		/*admin only*/
-		$recode->status 	= $request->input('status');
-		// $recode->paied 	= ($request->input('paied')) ?1:0;
+		foreach($recode_ids as $recode_id) {
+			$recode = Recode::find($recode_id);
 
-		if($recode->save())
-			return  redirect('/admin/recodes/receive')->with('success','Success');
-		else
-			return  redirect('/admin/recodes/receive')->with('error','Something wrong  when you check receive recode');
+			$recode->status = $status;
+			$recode->save();
+		}
+
+		return  redirect('/admin/recodes/receive')->with('success','Receive Check Success');
+	}
+
+
+
+	public function postReserveStatus(Request $request,Guard $auth)
+	{	
+		// $user_id = $request->input('user_id');
+		// $user = User::find($user_id);
+
+		// if(empty($user_id))
+		// 	return json_encode(array('msg'=>'no user selected or no such user'));
+
+		// $pets = $user->pets;
+
+		// if(empty($pets))
+		// 	return json_encode(array('msg'=>'no pet for this user'));
+
+		$sFirstDate 	= $request->input('first_date');
+		$iNumber 	= $request->input('number');
+
+		$sDate = $sFirstDate;
+		$sToday = date("Y-m-d");
+		$sEndDate = date("Y-m-d",strtotime("+14 day"));  //	能預約的最後一天
+		$iMaxReserve = Recode::$max_reserve_count;
+		$aReserveStatus = array();
+		for ($i=0; $i < $iNumber; $i++) {
+			if(strtotime($sDate)<=strtotime($sToday))
+				$aReserveStatus[$sDate] = "已過期";
+			elseif(strtotime($sDate)>strtotime($sEndDate))
+				$aReserveStatus[$sDate] = "未開放預約";
+			else{
+				$iCount = Recode::where("service_date","=",$sDate)->where("status","in",array(0,1))->count();
+				$iRemainNumber = $iMaxReserve - $iCount;//剩餘數量
+				if($iRemainNumber<=0)
+					$aReserveStatus[$sDate] = "預約已滿";
+				elseif($iRemainNumber<=3)
+					$aReserveStatus[$sDate] = "尚可預約數量：".$iRemainNumber;
+				else
+					$aReserveStatus[$sDate] = "尚可預約";
+			}
+
+			$sDate = date("Y-m-d",strtotime("+1 day",strtotime($sDate)));
+		}
+		return json_encode($aReserveStatus);
 	}
 
 	/**

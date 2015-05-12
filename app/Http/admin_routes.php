@@ -108,7 +108,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function() {
     Route::get('recodes/{date}', 'RecodeController@getAdmin');    
     Route::get('recodes/edit/{id}', 'RecodeController@getAdminedit');    
     Route::post('recodes/edit/{id}', 'RecodeController@postAdminedit');    
-   
+    
+    //for ajax
     Route::post('recodes/finduser', 'RecodeController@postFinduser');
     Route::post('recodes/findpet', 'RecodeController@postFindpet');
+    Route::post('recodes/reserve_status', 'RecodeController@postReserveStatus');
 });

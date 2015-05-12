@@ -20,8 +20,34 @@
 		<div class="row">
 			@include('errors.list')
 
-			<form class="form-horizontal" role="form" method="POST" action="{!! URL::to('/admin/recodes/create') !!}">
+			<form class="form-horizontal" role="form" method="POST" action="{!! URL::to('/admin/recodes/receive') !!}">
 				<input type="hidden" name="_token" value="{{ csrf_token() }}">
+					
+				@foreach ($recodes as $date=>$date_recodes)
+					<label>{{$date}}--已經預約數量:{{$date_count[$date]}}</label>
+					<table class="table">	
+						<thead>
+							<tr>
+								<th>{{{ trans('recode.user') }}}</th>
+								<th>{{{ trans('recode.pet') }}}</th>
+								<th>{{{ trans('recode.create_at') }}}</th>
+								<th></th>
+							</tr>	
+						</thead>
+						<tbody>
+							@foreach($date_recodes as $recode)
+								<tr>
+									<td>{{{$recode->user->name}}}</td>
+									<td>{{{$recode->pet->name}}}</td>
+									<td>{{{$recode->created_at}}}</td>
+									<td><input type="checkbox" class="checkbox" value="{{$recode->id}}" name="checked_recode[]"></td>
+								</tr>
+							@endforeach
+						</tbody>
+					</table>
+					
+				@endforeach 
+
 				<div class="form-group">
 					<label class="col-md-4 control-label">{{{ trans('recode.status') }}}</label>
 
@@ -34,16 +60,13 @@
 					</div>
 				</div>
 
-				<div class="form-group">
+				<!-- <div class="form-group">
 					<label class="col-md-4 control-label">{{{ trans('recode.price') }}}</label>
-
 					<div class="col-md-6">
 						<input  type="text" class="form-control " name="price" value="" >
 					</div>
-				</div>
+				</div> -->
 				
-				
-
 				<div class="form-group">
 					<div class="col-md-6 col-md-offset-4">
 						<button type="submit" class="btn btn-primary">

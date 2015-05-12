@@ -24,6 +24,14 @@
 				<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
 				<div class="form-group">
+					<label class="col-md-4 control-label">{{{ trans('recode.service_date') }}}</label>
+
+					<div class="col-md-6">
+						<input type="text" class="form-control datepicker" name="service_date" value="{{ date('m/d/Y') }}">
+					</div>
+				</div>
+
+				<div class="form-group">
 					<label class="col-md-4 control-label">{{{ trans('recode.search_user_by') }}}</label>
 					<div class="col-md-6">
 						<select class="select input-sm"  id="method" name="method">

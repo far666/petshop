@@ -76,17 +76,71 @@
 				</div>
 			</form>
 		</div>
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div id="calendar" class="col-md-8"></div>
+		</div>
 	</div>
+		
+	
 @endsection
 
 
 {{-- Scripts --}}
 @section('scripts') 
 	<script src="{{asset('js/date-time/bootstrap-datepicker.min.js')}}"></script>
+	<!-- calender -->
+	<link rel='stylesheet' href="{{asset('js/fullcalendar/fullcalendar.css')}}" />
+	<script src="{{asset('js/fullcalendar/lib/moment.min.js')}}"></script>
+	<script src="{{asset('js/fullcalendar/fullcalendar.js')}}"></script>
 
 	<script type="text/javascript">
 		$(function(){
 			$('.datepicker').datepicker();
+			 $('#calendar').fullCalendar({
+				// put your options and callbacks here
+				 // weekends: false,
+			});
+
+			var view = $('#calendar').fullCalendar('getView');
+
+			start = view.start.format();
+			AllReserveStatus(start,42);	
 		});
+
+		function AllReserveStatus(first_date,number){
+			console.log(first_date);
+			console.log(number);
+			
+			$.ajax({
+				url: "{!! URL::to('/admin/recodes/reserve_status') !!}",
+				type: "post",
+				dataType: "json",
+				data:{
+					'first_date' : first_date,
+					'number' : number,
+					'_token' : '{{csrf_token()}}'
+				},
+				async: false,
+				cache: false,
+				success: function(data) {
+					if(data.msg){
+						alert(data.msg);
+						return;
+					}
+					console.log(data);
+					// var html = '';
+					// $.each(data,function(index,pet){
+					// 	html += "<option value="+pet.id+">"+pet.name+"</option>";
+					// });
+
+					// $('#pets').empty();
+					// $('#pets').append(html);
+				},
+				error: function() {
+					console.log("Error!");
+				}
+			});
+		}
 	</script>
 @stop

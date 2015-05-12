@@ -27,6 +27,8 @@ class Recode extends Model {
 				1=>'cash 23',
 			];
 
+	static public $max_reserve_count = 3;
+
 	public function pet(){
 		return $this->belongsTo('App\Pet');
 	}
