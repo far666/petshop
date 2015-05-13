@@ -97,7 +97,7 @@
 	<script type="text/javascript">
 		$(function(){
 			$('.datepicker').datepicker();
-			 $('#calendar').fullCalendar({
+			$('#calendar').fullCalendar({
 				// put your options and callbacks here
 				 // weekends: false,
 			});
@@ -105,7 +105,12 @@
 			var view = $('#calendar').fullCalendar('getView');
 
 			start = view.start.format();
-			AllReserveStatus(start,42);	
+			AllReserveStatus(start,42);
+
+			$('.fc-button').click(function(){
+				start = view.start.format();
+				AllReserveStatus(start,42);
+			});	
 		});
 
 		function AllReserveStatus(first_date,number){
@@ -129,13 +134,24 @@
 						return;
 					}
 					console.log(data);
-					// var html = '';
-					// $.each(data,function(index,pet){
-					// 	html += "<option value="+pet.id+">"+pet.name+"</option>";
-					// });
+					var all_events = [];
+					$.each(data,function(index,data){
+						all_events.push({
+							title:data.title,
+							start:data.date,
+							backgroundColor:data.color,
+						});
+					});
+					console.log(all_events);
 
-					// $('#pets').empty();
-					// $('#pets').append(html);
+					var source = {
+						events: all_events,
+						// color: 'yellow',   // an option!
+						textColor: 'black' // an option!
+					};
+
+					$('#calendar').fullCalendar( 'removeEvents');
+					$('#calendar').fullCalendar( 'addEventSource', source );
 				},
 				error: function() {
 					console.log("Error!");

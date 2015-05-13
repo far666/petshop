@@ -46,6 +46,15 @@ class RecodeController extends Controller {
 		$recode->service_date 	= date("Y-m-d",strtotime($request->input('service_date')));
 		$recode->status 	= array_search('預約中',Recode::$status);
 		
+
+		/**
+		*	service_date is in 28 days
+		*/
+		if(strtotime($recode->service_date) > strtotime("+28 day",strtotime(date("Y-m-d")))) {
+			return redirect($this->redirectPath())->with("error"," Chosen date needs in 28 days");
+		}	
+
+
 		/**
 		*	check the selected pet dont have other alive reserve today
 		*/
@@ -322,23 +331,31 @@ class RecodeController extends Controller {
 
 		$sDate = $sFirstDate;
 		$sToday = date("Y-m-d");
-		$sEndDate = date("Y-m-d",strtotime("+14 day"));  //	能預約的最後一天
+		$sEndDate = date("Y-m-d",strtotime("+28 day"));  //	能預約的最後一天
 		$iMaxReserve = Recode::$max_reserve_count;
 		$aReserveStatus = array();
 		for ($i=0; $i < $iNumber; $i++) {
-			if(strtotime($sDate)<=strtotime($sToday))
-				$aReserveStatus[$sDate] = "已過期";
-			elseif(strtotime($sDate)>strtotime($sEndDate))
-				$aReserveStatus[$sDate] = "未開放預約";
-			else{
+			$aReserveStatus[$i]['date'] = $sDate;
+
+			if(strtotime($sDate)<=strtotime($sToday)) {
+				$aReserveStatus[$i]['title'] = "已過期";
+				$aReserveStatus[$i]['color'] = "#BDBDBD";
+			} elseif(strtotime($sDate)>strtotime($sEndDate)) {
+				$aReserveStatus[$i]['title'] = "未開放預約";
+				$aReserveStatus[$i]['color'] = "#BDBDBD";
+			} else{
 				$iCount = Recode::where("service_date","=",$sDate)->where("status","in",array(0,1))->count();
 				$iRemainNumber = $iMaxReserve - $iCount;//剩餘數量
-				if($iRemainNumber<=0)
-					$aReserveStatus[$sDate] = "預約已滿";
-				elseif($iRemainNumber<=3)
-					$aReserveStatus[$sDate] = "尚可預約數量：".$iRemainNumber;
-				else
-					$aReserveStatus[$sDate] = "尚可預約";
+				if($iRemainNumber<=0) {
+					$aReserveStatus[$i]['title'] = "預約已滿";
+					$aReserveStatus[$i]['color'] = "red";
+				} elseif($iRemainNumber<=3) {
+					$aReserveStatus[$i]['title'] = "尚可預約數量：".$iRemainNumber;
+					$aReserveStatus[$i]['color'] = "yellow";
+				} else {
+					$aReserveStatus[$i]['title'] = "尚可預約";
+					$aReserveStatus[$i]['color'] = "blue";
+				}
 			}
 
 			$sDate = date("Y-m-d",strtotime("+1 day",strtotime($sDate)));
